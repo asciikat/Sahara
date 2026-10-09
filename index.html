@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#170d29">
+  <meta name="description" content="Sahara: missions, sleep, food, work and co-parenting in one pixel-heart planner.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Sahara">
+  <title>Sahara</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="preload" href="fonts/PressStart2P-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // Apply the saved theme before first paint so the page doesn't flash. Night is the default.
+    var theme = 'dark';
+    try {
+      var saved = JSON.parse(localStorage.getItem('sahara.v1')).settings.theme;
+      if (saved === 'light' || saved === 'dark' || saved === 'auto') theme = saved;
+    } catch (e) { /* no saved settings yet */ }
+    if (theme !== 'auto') document.documentElement.dataset.theme = theme;
+  </script>
+</head>
+<body data-tab="today">
+  <div class="app">
+    <header class="top">
+      <div class="brand-row">
+        <div class="brand">
+          <h1 class="logo">SAHARA</h1>
+          <p class="tagline" id="tagline"></p>
+        </div>
+        <button type="button" class="icon-toggle" id="soundBtn" data-act="sound" aria-pressed="false" aria-label="Sound effects"></button>
+      </div>
+      <div class="status" id="status">
+        <div class="meter" id="meter">
+          <div class="hearts" id="hearts" aria-hidden="true"></div>
+          <p class="meter-label" id="meterLabel"></p>
+        </div>
+        <div class="status-chips">
+          <p class="points" id="points"></p>
+          <p class="streak" id="streakChip"></p>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Today -->
+      <section class="tab" id="tab-today">
+        <section class="card hero" id="hero"></section>
+
+        <section class="card">
+          <h2 class="card-title">Good-job hearts</h2>
+          <ul class="checks" id="checkList"></ul>
+        </section>
+
+        <section class="card">
+          <h2 class="card-title">This week</h2>
+          <div id="weekCard"></div>
+        </section>
+
+        <section class="card">
+          <h2 class="card-title">Up next</h2>
+          <ul class="list" id="upNext"></ul>
+        </section>
+
+        <section class="card">
+          <h2 class="card-title">Badges</h2>
+          <div class="badges" id="badgeGrid"></div>
+          <p class="muted" id="badgeNote"></p>
+        </section>
+
+        <details class="card settings" id="settings">
+          <summary class="card-title">Settings &amp; backup</summary>
+          <form class="form" id="settingsForm" autocomplete="off">
+            <div class="row">
+              <label class="field"><span>Missions a day</span><input type="number" name="missionGoal" min="1" max="20" step="1"></label>
+              <label class="field"><span>Meals a day</span><input type="number" name="mealGoal" min="1" max="8" step="1"></label>
+              <label class="field"><span>Water (glasses)</span><input type="number" name="waterGoal" min="1" max="20" step="1"></label>
+              <label class="field"><span>Sleep (hours)</span><input type="number" name="sleepGoal" min="4" max="12" step="0.5"></label>
+            </div>
+            <div class="row">
+              <label class="field">
+                <span>Theme</span>
+                <select name="theme">
+                  <option value="auto">Match my phone</option>
+                  <option value="light">Light</option>
+                  <option value="dark">Night</option>
+                </select>
+              </label>
+              <label class="field check-field">
+                <span>Sound effects</span>
+                <input type="checkbox" name="sound">
+              </label>
+            </div>
+          </form>
+          <p class="muted">These goals decide when each daily heart fills.</p>
+          <div class="button-row">
+            <button class="btn small" type="button" data-act="export">Export backup</button>
+            <button class="btn small" type="button" data-act="import">Import backup</button>
+            <button class="btn small" type="button" data-act="install" id="installBtn" hidden>Install app</button>
+            <button class="btn small danger" type="button" data-act="reset">Erase all</button>
+          </div>
+          <input type="file" id="importFile" accept="application/json,.json" hidden>
+          <p class="muted">Everything is stored on this device. Export a backup to move it to another phone or keep a copy.</p>
+        </details>
+      </section>
+
+      <!-- Missions -->
+      <section class="tab" id="tab-missions" hidden>
+        <form class="card form" id="missionForm" autocomplete="off">
+          <h2 class="card-title" id="missionFormTitle">New mission</h2>
+          <label class="field">
+            <span>What needs doing?</span>
+            <input name="title" required maxlength="120" placeholder="e.g. Book the dentist">
+          </label>
+          <div class="row">
+            <label class="field">
+              <span>Who</span>
+              <select name="who">
+                <option>Me</option>
+                <option>Co-parent</option>
+                <option>Kids</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Type</span>
+              <select name="type">
+                <option>Job</option>
+                <option>Home</option>
+                <option>Self</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Points</span>
+              <select name="pts">
+                <option value="1">1 · small</option>
+                <option value="2" selected>2 · medium</option>
+                <option value="3">3 · big</option>
+              </select>
+            </label>
+          </div>
+          <div class="row">
+            <label class="field">
+              <span>Repeat</span>
+              <select name="repeat">
+                <option value="">Once</option>
+                <option value="daily">Every day</option>
+                <option value="weekly">Every week</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Due (optional)</span>
+              <input type="date" name="due">
+            </label>
+          </div>
+          <div class="button-row">
+            <button class="btn" type="submit" id="missionSubmit">Add mission</button>
+            <button class="btn ghost" type="button" id="missionCancel" data-act="cancelEdit" hidden>Cancel</button>
+          </div>
+        </form>
+
+        <div class="filters" id="filters" role="group" aria-label="Filter missions"></div>
+        <ul class="list" id="missionList"></ul>
+
+        <section class="card">
+          <h2 class="card-title">Rewards</h2>
+          <form class="inline-form" id="rewardForm" autocomplete="off">
+            <input name="title" required maxlength="80" placeholder="e.g. Bubble bath" aria-label="Reward name">
+            <input name="cost" type="number" min="1" max="999" value="10" required aria-label="Cost in points">
+            <button class="btn small" type="submit">Add</button>
+          </form>
+          <ul class="list" id="rewardList"></ul>
+          <p class="muted" id="redeemedNote"></p>
+        </section>
+      </section>
+
+      <!-- Sleep -->
+      <section class="tab" id="tab-sleep" hidden>
+        <form class="card form" id="sleepForm" autocomplete="off">
+          <h2 class="card-title">Log last night</h2>
+          <div class="row">
+            <label class="field">
+              <span>Went to bed</span>
+              <input type="time" name="bed" required>
+            </label>
+            <label class="field">
+              <span>Woke up</span>
+              <input type="time" name="wake" required>
+            </label>
+          </div>
+          <label class="field">
+            <span>Morning of</span>
+            <input type="date" name="date" required>
+          </label>
+          <fieldset class="field">
+            <legend>How rested did you feel?</legend>
+            <div class="pills">
+              <label><input type="radio" name="rest" value="1"><span>1</span></label>
+              <label><input type="radio" name="rest" value="2"><span>2</span></label>
+              <label><input type="radio" name="rest" value="3" checked><span>3</span></label>
+              <label><input type="radio" name="rest" value="4"><span>4</span></label>
+              <label><input type="radio" name="rest" value="5"><span>5</span></label>
+            </div>
+          </fieldset>
+          <button class="btn" type="submit">Save night</button>
+        </form>
+
+        <section class="card">
+          <h2 class="card-title">Last 7 nights</h2>
+          <div class="bars" id="sleepChart"></div>
+          <p class="muted" id="sleepAvg"></p>
+        </section>
+
+        <ul class="list" id="sleepList"></ul>
+      </section>
+
+      <!-- Food -->
+      <section class="tab" id="tab-food" hidden>
+        <section class="card">
+          <h2 class="card-title">Today's meals</h2>
+          <div class="slots" id="mealSlots"></div>
+        </section>
+
+        <section class="card">
+          <h2 class="card-title">Water today</h2>
+          <div class="water">
+            <button class="btn small" type="button" data-act="water" data-value="-1" id="waterDown" aria-label="Remove a glass">−</button>
+            <div class="dots" id="waterDots"></div>
+            <button class="btn small" type="button" data-act="water" data-value="1" id="waterUp" aria-label="Add a glass">+</button>
+          </div>
+          <p class="muted" id="waterLabel"></p>
+        </section>
+
+        <form class="card form" id="mealForm" autocomplete="off">
+          <h2 class="card-title">Log a meal</h2>
+          <div class="row">
+            <label class="field">
+              <span>Meal</span>
+              <select name="type">
+                <option>Breakfast</option>
+                <option>Lunch</option>
+                <option>Dinner</option>
+                <option>Snack</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Time</span>
+              <input type="time" name="time" required>
+            </label>
+          </div>
+          <label class="field">
+            <span>What did you eat?</span>
+            <input name="what" required maxlength="160" placeholder="e.g. Toast, banana, tea">
+          </label>
+          <button class="btn" type="submit">Add meal</button>
+        </form>
+
+        <ul class="list" id="mealList"></ul>
+      </section>
+
+      <!-- Work -->
+      <section class="tab" id="tab-job" hidden>
+        <section class="card">
+          <h2 class="card-title">This week at work</h2>
+          <p class="muted tight" id="jobWeek"></p>
+          <p class="big" id="jobTotal"></p>
+          <div class="bar-long" role="progressbar" aria-label="Hours worked this week" id="jobBar">
+            <div class="bar-long-fill" id="jobFill"></div>
+          </div>
+          <p class="muted" id="jobNote"></p>
+          <div class="bars" id="jobChart"></div>
+          <label class="field inline spaced">
+            <span>Weekly target (hours)</span>
+            <input type="number" id="jobTarget" min="1" max="80" step="0.5">
+          </label>
+        </section>
+
+        <form class="card form" id="shiftForm" autocomplete="off">
+          <h2 class="card-title">Log a shift</h2>
+          <div class="row">
+            <label class="field">
+              <span>Date</span>
+              <input type="date" name="date" required>
+            </label>
+            <label class="field">
+              <span>Hours</span>
+              <input type="number" name="hours" min="0.5" max="24" step="0.5" required>
+            </label>
+          </div>
+          <label class="field">
+            <span>Note (optional)</span>
+            <input name="note" maxlength="120" placeholder="e.g. Covered the late shift">
+          </label>
+          <button class="btn" type="submit">Log shift</button>
+        </form>
+
+        <ul class="list" id="shiftList"></ul>
+      </section>
+
+      <!-- Co-parent -->
+      <section class="tab" id="tab-coparent" hidden>
+        <section class="card">
+          <h2 class="card-title">Waiting on co-parent</h2>
+          <ul class="list flush" id="coList"></ul>
+        </section>
+
+        <form class="card form" id="handoffForm" autocomplete="off">
+          <h2 class="card-title">Handoff note</h2>
+          <label class="field">
+            <span>Note to share</span>
+            <textarea name="text" required maxlength="500" rows="3" placeholder="e.g. Kids need the PE kit by Friday"></textarea>
+          </label>
+          <button class="btn" type="submit">Add note</button>
+        </form>
+
+        <ul class="list" id="handoffList"></ul>
+
+        <section class="card">
+          <h2 class="card-title">Weekly report</h2>
+          <p class="muted tight">A plain-text summary you can paste into a message.</p>
+          <textarea id="reportText" rows="10" readonly aria-label="Weekly report"></textarea>
+          <div class="button-row spaced">
+            <button class="btn" type="button" data-act="copy">Copy report</button>
+            <button class="btn" type="button" data-act="share" id="shareBtn" hidden>Share</button>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <nav class="tabbar" aria-label="Sections">
+    <button type="button" data-act="tab" data-value="today" aria-current="page"><span class="tab-icon" data-icon="heart"></span><span>Today</span></button>
+    <button type="button" data-act="tab" data-value="missions"><span class="tab-icon" data-icon="check"></span><span>Missions</span></button>
+    <button type="button" data-act="tab" data-value="sleep"><span class="tab-icon" data-icon="moon"></span><span>Sleep</span></button>
+    <button type="button" data-act="tab" data-value="food"><span class="tab-icon" data-icon="apple"></span><span>Food</span></button>
+    <button type="button" data-act="tab" data-value="job"><span class="tab-icon" data-icon="case"></span><span>Work</span></button>
+    <button type="button" data-act="tab" data-value="coparent"><span class="tab-icon" data-icon="people"></span><span>Co-parent</span></button>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span id="toastMsg"></span>
+    <button type="button" id="toastAction" data-act="toastAction" hidden></button>
+  </div>
+
+  <script src="js/pixel.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/ui.js"></script>
+</body>
+</html>

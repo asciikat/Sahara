@@ -1,0 +1,22 @@
+{
+  "name": "Sahara",
+  "short_name": "Sahara",
+  "description": "Missions, sleep, food, work and co-parenting in one pixel-heart planner.",
+  "start_url": "./#today",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#170d29",
+  "theme_color": "#170d29",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "New mission", "url": "./#missions" },
+    { "name": "Log sleep", "url": "./#sleep" },
+    { "name": "Log a meal", "url": "./#food" }
+  ]
+}

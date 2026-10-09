@@ -1,0 +1,10 @@
+{
+  "name": "sahara",
+  "version": "2.0.0",
+  "private": true,
+  "description": "A pixel-heart planner for missions, sleep, food, work and co-parenting.",
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "start": "python3 -m http.server 8000"
+  }
+}
