@@ -69,7 +69,7 @@ test('normalizeState repairs garbage instead of trusting it', () => {
   assert.deepEqual(s.shifts.map((x) => x.hours), [24]);
   assert.equal(s.settings.missionGoal, 1);
   assert.equal(s.settings.sleepGoal, 7);
-  assert.equal(s.settings.theme, 'auto');
+  assert.equal(s.settings.theme, 'dark', 'unknown themes fall back to Night');
   assert.equal(s.settings.sound, false);
   assert.deepEqual(s.badges, { first: WED });
 });

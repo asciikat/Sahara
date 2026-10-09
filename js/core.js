@@ -25,7 +25,7 @@
     sleepGoal: 7,   // hours a night for the Sleep heart
     jobTarget: 37.5, // hours a week at work
     sound: false,
-    theme: 'auto',
+    theme: 'dark', // the Night theme
   });
 
   // ---------- small helpers ----------
@@ -108,7 +108,7 @@
       sleepGoal: clampNum(rs.sleepGoal, 4, 12, DEFAULT_SETTINGS.sleepGoal),
       jobTarget: clampNum(rs.jobTarget !== undefined ? rs.jobTarget : r.jobTarget, 1, 80, DEFAULT_SETTINGS.jobTarget),
       sound: rs.sound === true,
-      theme: oneOf(rs.theme, THEMES, 'auto'),
+      theme: oneOf(rs.theme, THEMES, DEFAULT_SETTINGS.theme),
     };
 
     s.missions = build(r.missions, (m) => {

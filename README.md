@@ -11,7 +11,7 @@ A pixel-heart planner for one person juggling their own day, the kids, and work.
 - **Food**: four meal slots a day, a meal log, and a water tracker.
 - **Work**: log shifts and see the week's hours against your target, day by day.
 - **Co-parent**: the missions waiting on your co-parent, handoff notes, and a plain-text weekly report to copy or share into a message.
-- **Settings & backup**: set your own daily goals, light/night theme, optional 8-bit sound effects (off by default), and export or import a backup file.
+- **Settings & backup**: set your own daily goals, light/night theme (Night is the default), optional 8-bit sound effects (off by default), and export or import a backup file.
 
 ## Running it
 
