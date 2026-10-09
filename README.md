@@ -21,13 +21,15 @@ There is no build step. Open `index.html` in a browser, or serve the folder:
 npm start        # python3 -m http.server 8000, then visit http://localhost:8000
 ```
 
-## Put it on your phone
+## Put it on your phone (GitHub Pages)
 
-The app is a PWA: it works offline and can be added to your home screen. That needs it served over HTTPS, and the simplest way is GitHub Pages:
+The app is a PWA: it works offline and can be added to your home screen. That needs it served over HTTPS, which GitHub Pages does for free. Setup is one setting plus a merge:
 
-1. Merge to `main`.
-2. In the repo go to **Settings → Pages**, choose **Deploy from a branch**, pick `main` and `/ (root)`, and save.
-3. Open the `https://<you>.github.io/Sahara/` link on your phone, then **Share → Add to Home Screen** (iPhone) or **Install app** (Android/Chrome, also under Settings in the app).
+1. In the repo go to **Settings → Pages**, and under **Build and deployment** set **Source** to **GitHub Actions**.
+2. Merge this work into `main`. The **Deploy to GitHub Pages** workflow runs the tests and publishes the site. You can also run it by hand from the **Actions** tab.
+3. Open `https://<your-github-name>.github.io/Sahara/` on your phone, then **Share → Add to Home Screen** (iPhone) or **Install app** (Android/Chrome, or Settings in the app).
+
+Every later change merged to `main` is published the same way. The app only uses relative paths, so it works from the `/Sahara/` subfolder.
 
 ## Where data lives
 
