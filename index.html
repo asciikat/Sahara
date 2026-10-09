@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ff4d8d">
+  <meta name="description" content="Sahara: missions, sleep, food, work and co-parenting in one pixel-heart planner.">
+  <title>Sahara</title>
+  <link rel="icon" id="favicon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="brand">
+        <h1 class="logo">SAHARA</h1>
+        <p class="tagline">missions · sleep · food · work · co-parenting</p>
+      </div>
+      <div class="status">
+        <div class="meter" id="meter">
+          <div class="hearts" id="hearts"></div>
+          <p class="meter-label" id="meterLabel"></p>
+        </div>
+        <p class="points" id="points" title="Love points you can spend on rewards"></p>
+      </div>
+    </header>
+
+    <main>
+      <!-- Missions -->
+      <section class="tab" id="tab-missions">
+        <form class="card form" id="missionForm" autocomplete="off">
+          <h2 class="card-title">New mission</h2>
+          <label class="field">
+            <span>What needs doing?</span>
+            <input name="title" required maxlength="120" placeholder="e.g. Book the dentist">
+          </label>
+          <div class="row">
+            <label class="field">
+              <span>Who</span>
+              <select name="who">
+                <option>Me</option>
+                <option>Co-parent</option>
+                <option>Kids</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Type</span>
+              <select name="type">
+                <option>Job</option>
+                <option>Home</option>
+                <option>Self</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Points</span>
+              <select name="pts">
+                <option value="1">1 · small</option>
+                <option value="2" selected>2 · medium</option>
+                <option value="3">3 · big</option>
+              </select>
+            </label>
+          </div>
+          <label class="field">
+            <span>Due (optional)</span>
+            <input type="date" name="due">
+          </label>
+          <button class="btn" type="submit">Add mission</button>
+        </form>
+
+        <div class="filters" id="filters" role="group" aria-label="Filter missions"></div>
+        <ul class="list" id="missionList"></ul>
+
+        <section class="card">
+          <h2 class="card-title">Rewards</h2>
+          <form class="inline-form" id="rewardForm" autocomplete="off">
+            <input name="title" required maxlength="80" placeholder="e.g. Bubble bath" aria-label="Reward name">
+            <input name="cost" type="number" min="1" max="999" value="10" required aria-label="Cost in points">
+            <button class="btn small" type="submit">Add</button>
+          </form>
+          <ul class="list" id="rewardList"></ul>
+          <p class="muted" id="redeemedNote"></p>
+        </section>
+      </section>
+
+      <!-- Sleep -->
+      <section class="tab" id="tab-sleep" hidden>
+        <form class="card form" id="sleepForm" autocomplete="off">
+          <h2 class="card-title">Log last night</h2>
+          <div class="row">
+            <label class="field">
+              <span>Went to bed</span>
+              <input type="time" name="bed" required>
+            </label>
+            <label class="field">
+              <span>Woke up</span>
+              <input type="time" name="wake" required>
+            </label>
+          </div>
+          <label class="field">
+            <span>Morning of</span>
+            <input type="date" name="date" required>
+          </label>
+          <fieldset class="field">
+            <legend>How rested did you feel?</legend>
+            <div class="pills">
+              <label><input type="radio" name="rest" value="1"><span>1</span></label>
+              <label><input type="radio" name="rest" value="2"><span>2</span></label>
+              <label><input type="radio" name="rest" value="3" checked><span>3</span></label>
+              <label><input type="radio" name="rest" value="4"><span>4</span></label>
+              <label><input type="radio" name="rest" value="5"><span>5</span></label>
+            </div>
+          </fieldset>
+          <button class="btn" type="submit">Save night</button>
+        </form>
+
+        <section class="card">
+          <h2 class="card-title">Last 7 nights</h2>
+          <div class="bars" id="sleepChart"></div>
+          <p class="muted" id="sleepAvg"></p>
+        </section>
+
+        <ul class="list" id="sleepList"></ul>
+      </section>
+
+      <!-- Food -->
+      <section class="tab" id="tab-food" hidden>
+        <section class="card">
+          <h2 class="card-title">Water today</h2>
+          <div class="water">
+            <button class="btn small" type="button" data-act="water" data-value="-1" id="waterDown" aria-label="Remove a glass">−</button>
+            <div class="dots" id="waterDots"></div>
+            <button class="btn small" type="button" data-act="water" data-value="1" id="waterUp" aria-label="Add a glass">+</button>
+          </div>
+          <p class="muted" id="waterLabel"></p>
+        </section>
+
+        <form class="card form" id="mealForm" autocomplete="off">
+          <h2 class="card-title">Log a meal</h2>
+          <div class="row">
+            <label class="field">
+              <span>Meal</span>
+              <select name="type">
+                <option>Breakfast</option>
+                <option>Lunch</option>
+                <option>Dinner</option>
+                <option>Snack</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Time</span>
+              <input type="time" name="time" required>
+            </label>
+          </div>
+          <label class="field">
+            <span>What did you eat?</span>
+            <input name="what" required maxlength="160" placeholder="e.g. Toast, banana, tea">
+          </label>
+          <button class="btn" type="submit">Add meal</button>
+        </form>
+
+        <ul class="list" id="mealList"></ul>
+      </section>
+
+      <!-- Job -->
+      <section class="tab" id="tab-job" hidden>
+        <section class="card">
+          <h2 class="card-title">This week at work</h2>
+          <p class="muted" id="jobWeek" style="margin-top:0"></p>
+          <p class="big" id="jobTotal"></p>
+          <div class="bar-long" role="progressbar" aria-label="Hours worked this week">
+            <div class="bar-long-fill" id="jobFill"></div>
+          </div>
+          <p class="muted" id="jobNote"></p>
+          <label class="field inline" style="margin-top:14px">
+            <span>Weekly target (hours)</span>
+            <input type="number" id="jobTarget" min="1" max="80" step="0.5">
+          </label>
+        </section>
+
+        <form class="card form" id="shiftForm" autocomplete="off">
+          <h2 class="card-title">Log a shift</h2>
+          <div class="row">
+            <label class="field">
+              <span>Date</span>
+              <input type="date" name="date" required>
+            </label>
+            <label class="field">
+              <span>Hours</span>
+              <input type="number" name="hours" min="0.5" max="24" step="0.5" required>
+            </label>
+          </div>
+          <label class="field">
+            <span>Note (optional)</span>
+            <input name="note" maxlength="120" placeholder="e.g. Covered the late shift">
+          </label>
+          <button class="btn" type="submit">Log shift</button>
+        </form>
+
+        <ul class="list" id="shiftList"></ul>
+      </section>
+
+      <!-- Co-parent -->
+      <section class="tab" id="tab-coparent" hidden>
+        <section class="card">
+          <h2 class="card-title">Waiting on co-parent</h2>
+          <ul class="list" id="coList" style="margin-bottom:0"></ul>
+        </section>
+
+        <form class="card form" id="handoffForm" autocomplete="off">
+          <h2 class="card-title">Handoff note</h2>
+          <label class="field">
+            <span>Note to share</span>
+            <textarea name="text" required maxlength="500" rows="3" placeholder="e.g. Kids need the PE kit by Friday"></textarea>
+          </label>
+          <button class="btn" type="submit">Add note</button>
+        </form>
+
+        <ul class="list" id="handoffList"></ul>
+
+        <section class="card">
+          <h2 class="card-title">Weekly report</h2>
+          <p class="muted" style="margin-top:0">A plain-text summary you can paste into a message.</p>
+          <textarea id="reportText" rows="10" readonly aria-label="Weekly report"></textarea>
+          <button class="btn" type="button" data-act="copy" style="margin-top:12px">Copy report</button>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <nav class="tabbar" aria-label="Sections">
+    <button type="button" data-act="tab" data-value="missions" aria-current="page">Missions</button>
+    <button type="button" data-act="tab" data-value="sleep">Sleep</button>
+    <button type="button" data-act="tab" data-value="food">Food</button>
+    <button type="button" data-act="tab" data-value="job">Job</button>
+    <button type="button" data-act="tab" data-value="coparent">Co-parent</button>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
